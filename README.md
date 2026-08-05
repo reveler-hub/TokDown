@@ -9,6 +9,8 @@ images and audio, then stitches them into an MP4 for you automatically —
 or, if you'd rather have the raw images and audio track separately, one
 checkbox switches to that instead.
 
+<img width="780" height="718" alt="TokDown" src="https://github.com/user-attachments/assets/d8f17642-6a56-44b5-8c99-27a0a4689f84" />
+
 ## Features
 
 - **Videos** — paste a single video link, or a whole profile/account URL
