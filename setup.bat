@@ -86,6 +86,6 @@ if %errorlevel% == 0 (
 echo ==========================================
 echo  Setup complete!
 echo ==========================================
-echo Run TokDown with:
+echo Run TokDown by double-clicking:
 echo     TokDown.py
 pause
