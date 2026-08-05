@@ -53,7 +53,7 @@ checkbox switches to that instead.
 2. **Download this project** (green "Code" button → "Download ZIP" if
    you're not using git) and unzip it somewhere.
 
-3. **Double-click `setup.bat`.** A black terminal window opens and does
+3. **Double-click `setup_windows.bat`.** A black terminal window opens and does
    everything for you — creates a private Python environment for TokDown,
    installs what it needs, and downloads the browser component used for
    slideshow posts. This takes a few minutes and needs an internet
