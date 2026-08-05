@@ -66,27 +66,6 @@ import urllib.request
 from pathlib import Path
 from tkinter import filedialog, messagebox, scrolledtext
 
-# On Unix, the bash-polyglot header above already re-execs into
-# TokDown_Venv's own python before any of this runs. Windows has no
-# shebang-line execution, so if this got started under some other
-# interpreter — double-clicked, or run as `python TokDown.py` with
-# whatever Python is on PATH — do the equivalent here instead, before
-# any third-party imports below (which would otherwise either fail or,
-# worse, silently succeed against the wrong versions of things — see
-# curl-cffi's version pinning below for why that's a real problem here).
-#
-# On win32 this ALSO re-execs into pythonw.exe specifically, not
-# python.exe, even if already running inside TokDown_Venv — regardless of
-# how this got started (a plain python.org install, the Microsoft Store's
-# python.exe app-execution-alias hosted in Windows Terminal, a .bat
-# double-click, ...), python.exe is a console-subsystem binary and always
-# has *some* console window attached, however it got there. Hiding that
-# window after the fact (an earlier approach) proved unreliable — with
-# Windows Terminal as the host it came back minimized instead of hidden.
-# pythonw.exe is a different binary, linked /SUBSYSTEM:WINDOWS, so
-# Windows never allocates it a console in the first place — nothing to
-# hide or fail to hide. Every normal Python install (Store or python.org)
-# ships both exes side by side, so this needs no extra setup.
 _script_dir = Path(__file__).resolve().parent
 _venv_dir = _script_dir / "TokDown_Venv"
 if sys.platform == "win32":
@@ -146,32 +125,10 @@ BASE_OUTPUT_FOLDER = Path(
 _ORIGINAL_OUTPUT_FOLDER = BASE_OUTPUT_FOLDER
 BASE_OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
 CAMOUFOX_PROFILE = SCRIPT_DIR / "TokDown_Profile"
-
-# yt-dlp's console-script exe lives inside TokDown_Venv (that's where it
-# was pip-installed), but re-exec'ing into the venv's python above does
-# NOT "activate" it — PATH still points wherever the OS/shell had it
-# pointed before TokDown ever ran. shutil.which("yt-dlp") therefore often
-# can't see it and falls back to a bare "yt-dlp" string, which Windows'
-# subprocess.Popen cannot resolve on its own (WinError 2: cannot find the
-# file specified). Look inside the venv first — we know exactly where it
-# is — and only fall back to a PATH search / bare name if that's missing
-# (e.g. someone runs this outside of TokDown_Venv entirely).
 _venv_ytdlp = _venv_dir / ("Scripts/yt-dlp.exe" if sys.platform == "win32" else "bin/yt-dlp")
 YTDLP_EXE = str(_venv_ytdlp) if _venv_ytdlp.exists() else (shutil.which("yt-dlp") or "yt-dlp")
 IMPERSONATE_TARGET = "chrome"
-
-# Now that this whole app runs under pythonw.exe on Windows (see the
-# re-exec block above), there's no console for child processes to share —
-# without this flag, every yt-dlp/ffmpeg/ffprobe call would pop its own
-# brand-new, briefly-visible console window. subprocess.CREATE_NO_WINDOW
-# only exists on Windows; elsewhere this is just 0 (no-op flag).
 SUBPROCESS_CREATIONFLAGS = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-
-# Every error/warning the app logs, plus any actual crash (unhandled
-# exception — main thread, a background thread, or a Tk GUI callback),
-# gets written here. Reset fresh each launch so a bug report is just this
-# one session, not old runs mixed in — meant to be attached as-is to a
-# GitHub issue.
 ERROR_LOG_FILE = SCRIPT_DIR / "TokDown_error_log.txt"
 
 
@@ -299,11 +256,6 @@ def _should_log(line: str) -> bool:
 # ============================================================================
 # DOWNLOAD ENGINE
 # ============================================================================
-# Retry tuning: each retry pass raises the sleep-interval window, since the
-# "Unexpected response from webpage request" errors look like TikTok
-# probabilistically rate-limiting/challenging individual requests rather
-# than anything wrong with the request itself — spacing requests out
-# further is the only real lever available.
 MAX_RETRIES = 2
 BASE_SLEEP_MIN, BASE_SLEEP_MAX = 3, 9
 RETRY_SLEEP_STEP = 5
@@ -367,12 +319,6 @@ def _run_ytdlp_batch(
         "--newline",             # one progress update per line (parseable)
     ]
     if write_thumbnails:
-        # Only used for unclassified account/profile URLs that might
-        # contain slideshow posts (see download_tiktok()'s docstring) —
-        # yt-dlp can't extract a slideshow's actual video, so its
-        # thumbnail is the only visual it can salvage. Confirmed video
-        # URLs never set this; nobody wants a stray thumbnail file next
-        # to a video they already have.
         cmd.append("--write-all-thumbnails")
 
     process = None
@@ -717,11 +663,6 @@ def process_tiktok_urls(
 # ============================================================================
 # SLIDESHOW / PHOTO POST PIPELINE
 # ============================================================================
-# Plain HTTP headers used for downloading images/audio — TikTok's CDN URLs
-# come back from item/detail already pre-signed (x-expires/x-signature in
-# the query string), so a normal GET with a real-looking User-Agent and
-# Referer is all that's needed. No curl_cffi/impersonation required here,
-# and no OS-specific tooling — urllib.request is stdlib, same on Windows.
 _ASSET_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
