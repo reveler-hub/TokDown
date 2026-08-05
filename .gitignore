@@ -1,0 +1,22 @@
+# Private Python environment created by setup.sh / setup.bat
+TokDown_Venv/
+
+# Persistent Camoufox browser profile — holds real browser session data,
+# not just cache (see TokDown.py's module docstring)
+TokDown_Profile/
+
+# Default download output folder and anything TokDown writes into it
+TikToks/
+tokdown_failed_links.txt
+tokdown_skipped_slideshows.txt
+queue_tiktok.txt
+
+# Per-launch error log (reset fresh every run)
+TokDown_error_log.txt
+
+# Remembered last-used output folder
+.TokDown_last_folder.txt
+
+# Python
+__pycache__/
+*.pyc
