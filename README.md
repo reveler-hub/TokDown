@@ -1,6 +1,6 @@
 # TokDown
 
-Download TikTok videos, photo/slideshow posts, and whole accounts — with real slideshow-to-Video support.
+Download TikTok videos, photo/slideshow posts, and whole accounts — with real Slideshow-to-Video support.
 
 TikTok slideshow posts (the ones made of photos instead of a video) don't
 work with normal downloaders, since TikTok doesn't actually store them as a
@@ -8,6 +8,9 @@ video file at all. TokDown handles those properly: it fetches the real
 images and audio, then stitches them into an MP4 for you automatically —
 or, if you'd rather have the raw images and audio track separately, one
 checkbox switches to that instead.
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-GPL--3.0-green)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
 
 <img width="780" height="718" alt="TokDown" src="https://github.com/user-attachments/assets/d8f17642-6a56-44b5-8c99-27a0a4689f84" />
 
